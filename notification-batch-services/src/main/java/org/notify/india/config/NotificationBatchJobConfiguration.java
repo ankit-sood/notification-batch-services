@@ -2,6 +2,7 @@ package org.notify.india.config;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.notify.india.constants.JobConstants;
 import org.notify.india.model.Notification;
@@ -17,6 +18,7 @@ import org.springframework.batch.core.configuration.support.JobRegistryBeanPostP
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -102,5 +104,18 @@ public class NotificationBatchJobConfiguration {
 	@StepScope
 	public PassThroughItemProcessor<Notification> passthroughPassThroughItemProcessor(){
 		return new PassThroughItemProcessor<>();
+	}
+	
+	@Bean
+	@StepScope
+	public ItemWriter<Notification> writer(){
+		return new ItemWriter<Notification>() {
+			@Override
+			public void write(List<? extends Notification> items) throws Exception {
+				for(Notification notification:items) {
+					System.err.println("Writting item: "+ notification.toString());
+				}
+			}
+		};
 	}
 }
