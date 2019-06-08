@@ -76,6 +76,7 @@ public class NotificationBatchJobConfiguration {
 										 .resource(new PathResource(Paths.get(applicationProperties.getBatch().getInputPath()+File.separator+fileName)))
 										 .linesToSkip(1)
 										 .lineMapper(lineMapper())
+										 .strict(false)
 										 .build();
 	}
 	
