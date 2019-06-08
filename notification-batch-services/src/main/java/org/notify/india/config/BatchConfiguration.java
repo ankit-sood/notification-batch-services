@@ -28,7 +28,7 @@ public class BatchConfiguration implements BatchConfigurer{
 	private PlatformTransactionManager batchTransactionManager;
 	
 	@Autowired
-	@Qualifier(value="batchDataSource")
+	@Qualifier(value="batchH2DataSource")
 	private DataSource batchH2DataSource;
 	
 	@Override
