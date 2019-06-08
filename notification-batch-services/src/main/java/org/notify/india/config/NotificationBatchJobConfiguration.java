@@ -22,6 +22,7 @@ import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +66,7 @@ public class NotificationBatchJobConfiguration {
 		return this.stepBuilderFactory.get(JobConstants.STEP_NAME).tasklet(new Tasklet() {
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-				System.out.print("Hello All!!!");
+				System.err.print("Hello All!!!");
 				return RepeatStatus.FINISHED;
 			}
 		}).build();
@@ -82,12 +83,11 @@ public class NotificationBatchJobConfiguration {
 	@Bean
 	@StepScope
 	public FlatFileItemReader<Notification> itemReader(@Value("#{jobParameters['"+ JobConstants.JOB_PARAM_FILE_NAME +"'}") String fileName){
-		new FlatFileItemReaderBuilder<Notification>().name("notification-item-reader")
+		return new FlatFileItemReaderBuilder<Notification>().name("notification-item-reader")
 										 .resource(new PathResource(Paths.get(applicationProperties.getBatch().getInputPath()+File.separator+fileName)))
 										 .linesToSkip(1)
 										 .lineMapper(lineMapper())
 										 .build();
-		return null;
 	}
 	
 	@Bean
@@ -96,5 +96,11 @@ public class NotificationBatchJobConfiguration {
 		mapper.setFieldSetMapper((fieldSet) -> new Notification(fieldSet.readString(0),fieldSet.readString(1),fieldSet.readString(2),fieldSet.readString(3)));
 		mapper.setLineTokenizer(new DelimitedLineTokenizer(","));
 		return mapper;
+	}
+	
+	@Bean
+	@StepScope
+	public PassThroughItemProcessor<Notification> passthroughPassThroughItemProcessor(){
+		return new PassThroughItemProcessor<>();
 	}
 }
