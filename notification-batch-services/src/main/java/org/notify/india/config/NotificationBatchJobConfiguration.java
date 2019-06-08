@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class NotificationBatchJobConfig {
+public class NotificationBatchJobConfiguration {
 	//Configuration related to jobs
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
