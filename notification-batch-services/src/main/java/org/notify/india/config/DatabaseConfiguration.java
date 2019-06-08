@@ -52,11 +52,11 @@ public class DatabaseConfiguration {
 				.addScript("schema.sql").continueOnError(true).build();
 	}
 
-	@Bean(name = "batchTransactionManager")
-	public PlatformTransactionManager transactionManager() {
-		return new ResourcelessTransactionManager();
-		// return new JpaTransactionManager(batchEntityManagerFactory().getObject());
-	}
+//	@Bean(name = "batchTransactionManager")
+//	public PlatformTransactionManager transactionManager() {
+//		return new ResourcelessTransactionManager();
+//		// return new JpaTransactionManager(batchEntityManagerFactory().getObject());
+//	}
 	
 	@Bean
     public MBeanExporter exporter() {
