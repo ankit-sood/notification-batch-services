@@ -35,7 +35,7 @@ public class JobResource {
 		try {
 			jobLauncher.run(this.job, new JobParameters(parameterMap));
 		} catch (Exception e) {
-			new ResponseEntity<String>("Error Occured while invoking Job!",HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>("Error Occured while invoking Job!",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<String>("Job Invoked Successfully!",HttpStatus.OK);
 	}
