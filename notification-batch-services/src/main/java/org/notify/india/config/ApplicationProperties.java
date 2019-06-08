@@ -11,7 +11,7 @@ public class ApplicationProperties {
 	}
 	
 	public static class Batch{
-		private String inputPath = "";
+		private String inputPath = "D:/batchfiles/csv";
 		
 		public String getInputPath() {
 			return this.inputPath;
