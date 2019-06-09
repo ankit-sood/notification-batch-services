@@ -18,7 +18,7 @@ public class Notification implements Serializable{
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="notificationSequenceGen")
 	@SequenceGenerator(name="notificationSequenceGen")
 	@Column(name="notification_id")
-	private String id;
+	private Long id;
 	
 	@Column(name="message")
 	private String message;
@@ -36,7 +36,7 @@ public class Notification implements Serializable{
 		super();
 	}
 
-	public Notification(String id, String message, String type, String destiantionAddress) {
+	public Notification(Long id, String message, String type, String destiantionAddress) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -44,7 +44,7 @@ public class Notification implements Serializable{
 		this.destiantionAddress = destiantionAddress;
 	}
 	
-	public Notification(String id, String message, String type, String destiantionAddress, boolean isProcessed) {
+	public Notification(Long id, String message, String type, String destiantionAddress, boolean isProcessed) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -53,10 +53,10 @@ public class Notification implements Serializable{
 		this.isProcessed = isProcessed;
 	}
 	
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getMessage() {
