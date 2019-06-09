@@ -17,16 +17,21 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationBatchServicesApplication.class)
+//@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,StepScopeTestExecutionListener.class})
 @ActiveProfiles("dev")
 public class NotificationBatchJobConfigurationTest {
 
@@ -36,6 +41,9 @@ public class NotificationBatchJobConfigurationTest {
 	@Autowired
 	private FlatFileItemReader<Notification> itemReader;
 	
+	@Autowired
+	private ItemProcessor<Notification,Notification> itemProcessor;
+
 	private JobParameters jobParameters;
 	
 	@Before
@@ -84,6 +92,14 @@ public class NotificationBatchJobConfigurationTest {
 		}
 		assertEquals(1, count);
 	}
-
+	
+	@Test
+	public void testItemProcessor() throws Exception {
+		assertNotNull(itemProcessor);
+		Notification notification = new Notification("MZX779","Welcome to India","email","soodankit1993@gmail.com");
+		notification = itemProcessor.process(notification);
+		//notification = itemProcessor.apply(notification);
+		assertEquals(true, notification.isProcessed());
+	}
 
 }
