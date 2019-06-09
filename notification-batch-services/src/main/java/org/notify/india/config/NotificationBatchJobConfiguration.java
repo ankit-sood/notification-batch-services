@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.notify.india.constants.JobConstants;
 import org.notify.india.model.Notification;
 import org.springframework.batch.core.Job;
@@ -17,13 +19,14 @@ import org.springframework.batch.core.configuration.support.JobRegistryBeanPostP
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +43,10 @@ public class NotificationBatchJobConfiguration {
 	
 	@Autowired
 	private ApplicationProperties applicationProperties;
+	
+	@Autowired
+	@Qualifier(value="batchEntityManagerFactory")
+	private EntityManagerFactory batchEntityManagerFactory;
 	
 	@Bean
 	JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
@@ -66,7 +73,7 @@ public class NotificationBatchJobConfiguration {
 									  .<Notification,Notification>chunk(2)
 									  .reader(itemReader)
 									  .processor(itemProcessor())
-									  .writer(itemWriter())
+									  .writer(jpaItemWriter())
 									  .build();
 	}
 	
@@ -84,7 +91,7 @@ public class NotificationBatchJobConfiguration {
 	@Bean
 	public LineMapper<Notification> lineMapper(){
 		DefaultLineMapper<Notification> mapper = new DefaultLineMapper<>();
-		mapper.setFieldSetMapper((fieldSet) -> new Notification(fieldSet.readString(0),fieldSet.readString(1),fieldSet.readString(2),fieldSet.readString(3)));
+		mapper.setFieldSetMapper((fieldSet) -> new Notification(fieldSet.readLong(0),fieldSet.readString(1),fieldSet.readString(2),fieldSet.readString(3)));
 		mapper.setLineTokenizer(new DelimitedLineTokenizer(","));
 		return mapper;
 	}
@@ -114,5 +121,13 @@ public class NotificationBatchJobConfiguration {
 				}
 			}
 		};
+	}
+	
+	@Bean
+	@StepScope
+	public JpaItemWriter<Notification> jpaItemWriter(){
+		JpaItemWriter<Notification> jpaItemWriter = new JpaItemWriter<>();
+		jpaItemWriter.setEntityManagerFactory(batchEntityManagerFactory);
+		return jpaItemWriter;
 	}
 }
