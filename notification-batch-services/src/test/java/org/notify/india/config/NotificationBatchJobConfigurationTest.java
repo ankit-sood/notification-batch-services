@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.notify.india.NotificationBatchServicesApplication;
 import org.notify.india.constants.JobConstants;
 import org.notify.india.model.Notification;
-import org.notify.india.repository.PatientRepository;
+import org.notify.india.repository.NotificationRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -56,7 +56,7 @@ public class NotificationBatchJobConfigurationTest {
 	private JpaItemWriter<Notification> jpaItemWriter;
 	
 	@Autowired
-	private PatientRepository patientRepository;
+	private NotificationRepository notificationRepository;
 
 	private JobParameters jobParameters;
 	
@@ -130,7 +130,7 @@ public class NotificationBatchJobConfigurationTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		assertTrue(patientRepository.findAll().size()>0);
+		assertTrue(notificationRepository.findAll().size()>0);
 	}
 
 }
