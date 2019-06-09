@@ -17,7 +17,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@EnableJpaRepositories(basePackages= {"org.notify.india"})
+@EnableJpaRepositories(basePackages= {"org.notify.india"},entityManagerFactoryRef="batchEntityManagerFactory")
 public class JPARepositoriesConfig {
 	private DataSource batchH2DataSource;
 	private final Environment env;
