@@ -14,6 +14,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -64,7 +65,7 @@ public class NotificationBatchJobConfiguration {
 		return this.stepBuilderFactory.get(JobConstants.STEP_NAME)
 									  .<Notification,Notification>chunk(2)
 									  .reader(itemReader)
-									  .processor(passthroughPassThroughItemProcessor())
+									  .processor(itemProcessor())
 									  .writer(itemWriter())
 									  .build();
 	}
@@ -88,10 +89,18 @@ public class NotificationBatchJobConfiguration {
 		return mapper;
 	}
 	
-	@Bean
+	@Bean("itemProcessor")
 	@StepScope
-	public PassThroughItemProcessor<Notification> passthroughPassThroughItemProcessor(){
-		return new PassThroughItemProcessor<>();
+	public ItemProcessor<Notification,Notification> itemProcessor(){
+		return new ItemProcessor<Notification, Notification>() {
+			@Override
+			public Notification process(Notification item) throws Exception {
+				if(item.getDestiantionAddress()!=null && item.getMessage()!=null && item.getType()!=null) {
+					item.setProcessed(true);
+				}
+				return item;
+			}
+		};
 	}
 	
 	@Bean
