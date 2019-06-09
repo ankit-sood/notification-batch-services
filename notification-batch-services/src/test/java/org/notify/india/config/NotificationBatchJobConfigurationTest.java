@@ -2,9 +2,12 @@ package org.notify.india.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -13,11 +16,13 @@ import org.junit.runner.RunWith;
 import org.notify.india.NotificationBatchServicesApplication;
 import org.notify.india.constants.JobConstants;
 import org.notify.india.model.Notification;
+import org.notify.india.repository.PatientRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
@@ -28,11 +33,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationBatchServicesApplication.class)
-//@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,StepScopeTestExecutionListener.class})
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,StepScopeTestExecutionListener.class,TransactionalTestExecutionListener.class})
 @ActiveProfiles("dev")
+@Transactional
 public class NotificationBatchJobConfigurationTest {
 
 	@Autowired
@@ -43,6 +51,12 @@ public class NotificationBatchJobConfigurationTest {
 	
 	@Autowired
 	private ItemProcessor<Notification,Notification> itemProcessor;
+	
+	@Autowired
+	private JpaItemWriter<Notification> jpaItemWriter;
+	
+	@Autowired
+	private PatientRepository patientRepository;
 
 	private JobParameters jobParameters;
 	
@@ -96,10 +110,27 @@ public class NotificationBatchJobConfigurationTest {
 	@Test
 	public void testItemProcessor() throws Exception {
 		assertNotNull(itemProcessor);
-		Notification notification = new Notification("MZX779","Welcome to India","email","soodankit1993@gmail.com");
+		Notification notification = new Notification(12l,"Welcome to India","email","soodankit1993@gmail.com");
 		notification = itemProcessor.process(notification);
 		//notification = itemProcessor.apply(notification);
 		assertEquals(true, notification.isProcessed());
+	}
+	
+	@Test
+	public void testItemWriter() {
+		assertNotNull(jpaItemWriter);
+		StepExecution stepExecution = (StepExecution) MetaDataInstanceFactory.createStepExecution();
+		try {
+			List<Notification> notificationList = new ArrayList<>();
+			notificationList.add(new Notification(12l,"Welcome to India","email","soodankit1993@gmail.com",true));
+			StepScopeTestUtils.doInStepScope(stepExecution,()->{
+					jpaItemWriter.write(notificationList);
+					return null;
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		assertTrue(patientRepository.findAll().size()>0);
 	}
 
 }
